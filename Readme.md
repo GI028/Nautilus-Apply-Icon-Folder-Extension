@@ -1,82 +1,93 @@
-Nautilus Apply Icons Extension
-A Nautilus extension that allows you to use a dedicated folder of icons to apply custom emblems to its sibling folders.
+# Apply Icon Folders - Nautilus Python Extension
 
-Replace the placeholder image above with a screenshot or an animated GIF demonstrating your extension. Tools like Peek or Giphy Capture can create GIFs easily.
+## Overview
 
-Description
-This Python-based extension for the GNOME Nautilus file manager provides a quick way to manage custom folder icons for project theming.
+**Apply Icon Folders** is a Nautilus extension written in Python that simplifies the process of bulk updating folder icons using PNG files stored inside a special directory. The extension detects any folder whose name **starts with `.icons`** (for example, `.icons`, `.icons-theme`, or `.icons_backup`) and uses the `.png` icon files inside it to set custom icons for sibling folders on the same directory level.
 
-The core workflow is simple:
+When you right-click on such a folder (e.g., `.icons-theme`), an "Apply icons" option appears in the context menu. Selecting it will apply the icons from the `.png` files to the corresponding sibling folders whose names exactly match the icon filenames (without the `.png` extension). Folders without a matching icon will have any existing custom icon removed.
 
-Create a special folder (e.g., .icons-theme).
+## Features
 
-Fill it with .png icons whose names match the names of other folders at the same directory level.
+- Works with *any* folder starting with `.icons` (not strictly `.icons`).
+- Automatically scans sibling folders of the `.icons*` folder’s parent directory.
+- Applies `.png` icons whose filenames match sibling folder names.
+- Removes custom icons from folders that don't have a matching icon file.
+- Shows a desktop notification prompting to refresh Nautilus for changes to take effect.
 
-Right-click the special folder and select "Apply Icons From This Folder".
+## Installation
 
-The extension will automatically apply each icon to its corresponding folder. If a folder doesn't have a matching icon, its custom icon will be removed, reverting it to the default.
+### Download the Extension
 
-Features
-Bulk Icon Application: Apply dozens of custom folder icons with a single click.
+You can download the extension script from here:
+[nautilus-applyiconfoldersextension.py](nautilus-applyiconfoldersextension.py)
 
-Automatic Icon Removal: Cleans up custom icons from folders that no longer have a match in your icons folder.
+### Prerequisites
 
-User Notifications: Provides clear desktop notifications when the process is complete.
+- Nautilus (Files) version 3.x or 4.x
+- Python 3
+- `nautilus-python` package
+- PyGObject
+- `gio` command-line utility (usually installed with GLib)
 
-Detailed Logging: Creates a log file at ~/.nautilus-apply-icon-folder-extension.log for troubleshooting.
+#### Install dependencies on Debian/Ubuntu
+```bash
+sudo apt install python3-nautilus python3-gi libglib2.0-bin
+```
+#### Install dependencies on Fedora
+```bash
+sudo dnf install nautilus-python python3-gobject glib2-devel # Or just glib2 if glib2-devel is not found
+```
+### Installation Steps
 
-Requirements
-Before installing, ensure you have the following dependencies:
+1. Copy the downloaded `nautilus-applyiconfoldersextension.py` script to one of the Nautilus Python extensions directories:
 
-A Debian-based Linux distribution (e.g., Ubuntu, Pop!_OS, Linux Mint)
-
-Nautilus File Manager
-
-Python 3
-
-The python3-nautilus package
-
-The gir1.2-notify-0.7 package (for desktop notifications)
-
-The gio command-line utility (usually included with glib2.0-bin)
-
-On most Debian-based systems, you can install these with the following command:
-
-sudo apt update
-sudo apt install python3-nautilus gir1.2-notify-0.7
-
-Installation
-Download the script:
-Save the extension script as apply_icons_extension.py.
-
-Create the extensions directory:
-The script needs to be placed in the Nautilus Python extensions directory. If it doesn't exist, create it:
-
+- For user-only installation:
+```bash
 mkdir -p ~/.local/share/nautilus-python/extensions/
-
-Copy the script:
-Move the apply_icons_extension.py file into that directory:
-
-cp apply_icons_extension.py ~/.local/share/nautilus-python/extensions/
-
-Restart Nautilus:
-For the extension to be recognized, you must completely quit and restart Nautilus.
-
+cp ~/Downloads/nautilus-applyiconfoldersextension.py ~/.local/share/nautilus-python/extensions/
+```
+- For system-wide installation (requires root permissions):
+```bash
+sudo cp ~/Downloads/nautilus-applyiconfoldersextension.py /usr/share/nautilus-python/extensions/
+```
+2. Restart Nautilus to load the extension:
+```bash
 nautilus -q
-nautilus
+nautilus &
+```
+## Usage
 
-How to Use
-Navigate to a directory where you have several project folders (e.g., FolderA, FolderB, FolderC).
+1. Create a folder whose name begins with `.icons` inside a directory containing sibling folders you want to update icons for (e.g., `.icons-theme`).
 
-Create a new folder and name it with the prefix .icons-. For example, .icons-my-theme.
+2. Add `.png` icon files inside this `.icons*` folder. Each `.png` file’s name (without the extension) must exactly match the sibling folder name you wish to assign that icon to.
 
-Inside the .icons-my-theme folder, place your .png icons. The icon names (without the extension) must exactly match the names of the sibling folders. For example, to theme FolderA, you must have an icon named FolderA.png.
+3. Right-click the `.icons*` folder in Nautilus and select **"Apply icons"** from the context menu.
 
-Right-click on the .icons-my-theme folder.
+4. A notification will appear asking you to press `F5` or navigate away and back to refresh the folder view to see icon changes.
 
-Select "Apply Icons From This Folder" from the context menu.
+## How It Works
 
-A notification will appear. Press F5 or navigate away and back to see the icon changes.
+- The extension scans the parent directory of the `.icons*` folder and lists all sibling folders.
+- It collects all `.png` files inside the `.icons*` folder and matches their filenames against sibling folder names.
+- For matching names, it sets the folder’s custom icon metadata to the corresponding `.png`.
+- For folders without a matching icon, it removes any custom icon metadata.
+- Finally, it displays a desktop notification reminding you to refresh the Nautilus view.
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Troubleshooting
+
+- Ensure required dependencies (`python3-nautilus` and GI libraries) are installed.
+- Confirm the extension script is placed in the correct Nautilus extensions directory.
+- Restart Nautilus after installing or modifying the extension.
+- Run Nautilus with debug mode for troubleshooting:
+
+NAUTILUS_PYTHON_DEBUG=misc nautilus
+
+- Icon filenames and folder names are case-sensitive and must match exactly (excluding the `.png` extension).
+
+## License
+
+This extension is provided under the MIT License.
+
+---
+
+*This README was created to document a Nautilus Python extension that applies custom folder icons based on `.png` files inside any folder beginning with `.icons`.*
